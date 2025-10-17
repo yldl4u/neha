@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Yldl4u — Fake Social Post Generator (with watermark)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#071018; --panel:#0f1720; --glass: rgba(255,255,255,0.03);
+    --neon:#00d4ff; --accent:#7fffd4; --muted:#9fb0bd;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:28px; min-height:100vh; background:
+    radial-gradient(600px 300px at 10% 10%, rgba(0,212,255,0.03), transparent 8%),
+    radial-gradient(500px 250px at 90% 90%, rgba(127,255,212,0.02), transparent 8%),
+    linear-gradient(180deg,var(--bg), #04121a);
+    color:#e6f4f7; font-family:Inter,system-ui,Arial; -webkit-font-smoothing:antialiased;
+    display:flex; gap:24px; align-items:flex-start; justify-content:center; flex-wrap:wrap;
+  }
+
+  .panel{
+    width:420px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:18px;
+    border:1px solid rgba(255,255,255,0.03); box-shadow: 0 12px 40px rgba(2,6,23,0.6); backdrop-filter: blur(6px);
+  }
+  h1{margin:0 0 8px 0; font-size:20px; color:var(--neon); letter-spacing:1px;}
+  p.lead{margin:0 0 14px 0; color:var(--muted); font-size:13px;}
+
+  label{display:block; font-size:13px; color:#cfeff2; margin-top:10px; margin-bottom:6px;}
+  input[type="text"], textarea, select {
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); background:var(--glass); color:#dff; outline:none;
+    font-size:14px;
+  }
+  textarea{min-height:90px; resize:vertical}
+  .row{display:flex; gap:8px;}
+  .small{font-size:13px; color:var(--muted)}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; border:none; cursor:pointer;
+    background:linear-gradient(90deg,var(--neon),#00a8da); color:#001; font-weight:800; box-shadow: 0 8px 30px rgba(0,160,230,0.07);
+  }
+  .btn.ghost{ background:transparent; color:var(--neon); border:1px solid rgba(0,212,255,0.12); font-weight:700; box-shadow:none}
+
+  .controls{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+  .muted{color:var(--muted); font-size:13px; margin-top:8px}
+
+  /* preview */
+  .stage{
+    width:740px; min-height:560px; display:flex; align-items:center; justify-content:center;
+  }
+  .preview-wrap{
+    width:580px; min-height:420px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border-radius:12px; padding:12px; color:#000; position:relative;
+    box-shadow: 0 18px 60px rgba(2,6,23,0.6);
+  }
+  .preview-title{font-size:13px; color:#7a7a7a; text-align:center; margin-bottom:8px}
+
+  .post { width:520px; background:#fff; border-radius:10px; overflow:hidden; border:1px solid #e6e6e6; }
+
+  .post.top{ display:flex; align-items:center; gap:10px; padding:12px; }
+  .avatar{ width:48px; height:48px; border-radius:50%; background:linear-gradient(90deg,#ddd,#bbb); object-fit:cover; flex:0 0 48px; }
+  .user{ display:flex; flex-direction:column; justify-content:center; }
+  .username{ font-weight:700; font-size:15px }
+  .handle{ color:#7a7a7a; font-size:13px }
+
+  .post.image{ background:#000; height:360px; display:flex; align-items:center; justify-content:center; }
+  .post.image img{ max-width:100%; max-height:100%; display:block }
+
+  .post.bottom{ padding:12px; }
+  .icons{ display:flex; gap:14px; margin-bottom:8px; color:#222 }
+  .likes{ font-weight:700; margin-bottom:8px }
+  .caption{ font-size:14px; color:#222 }
+
+  .spacer{height:8px}
+
+  footer.small{ margin-top:18px; font-size:12px; color:var(--muted); text-align:center }
+
+  @media (max-width:1000px){
+    .stage{ width:100% }
+    .preview-wrap{ width:92% }
+    .panel{ width:90% }
+  }
+</style>
+</head>
+<body>
+
+  <div class="panel">
+    <h1>Fake Social Post Generator</h1>
+    <p class="lead">Create mock social posts (Instagram / Twitter / Facebook / WhatsApp Status). Watermark "<strong>Yldl4u</strong>" will be embedded in downloads.</p>
+
+    <label>Template</label>
+    <select id="template">
+      <option value="instagram">Instagram (square)</option>
+      <option value="twitter">Twitter (wide)</option>
+      <option value="facebook">Facebook (wide)</option>
+      <option value="whatsapp">WhatsApp Status (vertical)</option>
+    </select>
+
+    <label>Profile photo</label>
+    <div class="row">
+      <input id="profileFile" type="file" accept="image/*">
+      <button class="btn ghost" id="useRandomAvatar">Random</button>
+    </div>
+
+    <label>Display name</label>
+    <input id="displayName" type="text" value="Neha Ladly">
+
+    <label>Handle / @username</label>
+    <input id="handle" type="text" value="@Yldl4u">
+
+    <label>Post image</label>
+    <div class="row">
+      <input id="postFile" type="file" accept="image/*">
+      <button class="btn ghost" id="useRandomImage">Random</button>
+    </div>
+
+    <label>Caption</label>
+    <textarea id="caption">Sunset mood ✨ #yldl4u</textarea>
+
+    <div class="row" style="margin-top:8px;">
+      <div style="flex:1">
+        <label>Likes</label>
+        <input id="likes" type="text" value="12.3K">
+      </div>
+      <div style="width:120px">
+        <label>Comments</label>
+        <input id="comments" type="text" value="248">
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="generateBtn">Generate Post</button>
+      <button class="btn ghost" id="downloadBtn" style="display:none">Download Image</button>
+      <button class="btn ghost" id="copyCaption">Copy Caption</button>
+    </div>
+
+    <div class="muted">Tip: Random images are Unsplash-like placeholders. Use generated images for mockups only.</div>
+    <div class="spacer"></div>
+    <footer class="small">Made with ❤️ by Yldl4u — Use responsibly.</footer>
+  </div>
+
+  <div class="stage">
+    <div class="preview-wrap">
+      <div class="preview-title">Preview</div>
+      <div id="postContainer" style="display:flex; justify-content:center"></div>
+    </div>
+  </div>
+
+<script>
+/* Helper to load images */
+function loadImageFromFile(file){
+  return new Promise((resolve,reject)=>{
+    if(!file) return resolve(null);
+    const r = new FileReader();
+    r.onload = e => {
+      const img = new Image();
+      img.onload = ()=> resolve(img);
+      img.onerror = ()=> reject(new Error('img load err'));
+      img.src = e.target.result;
+    };
+    r.onerror = ()=> reject(new Error('file read err'));
+    r.readAsDataURL(file);
+  });
+}
+function loadImageFromUrl(url){
+  return new Promise((resolve,reject)=>{
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = ()=> resolve(img);
+    img.onerror = ()=> reject(new Error('img load err'));
+    img.src = url;
+  });
+}
+
+/* random placeholders */
+const RANDOM_AVATARS = [
+  'https://i.pravatar.cc/300?img=12',
+  'https://i.pravatar.cc/300?img=47',
+  'https://i.pravatar.cc/300?img=64',
+  'https://i.pravatar.cc/300?img=88'
+];
+const RANDOM_IMAGES = [
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1505682634904-d7c5a8b3f1b1?w=1200&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?w=1200&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200&q=80&auto=format&fit=crop'
+];
+
+let state = { avatarImg: null, postImg: null, template: 'instagram' };
+
+/* DOM refs */
+const profileFile = document.getElementById('profileFile');
+const postFile = document.getElementById('postFile');
+const useRandomAvatar = document.getElementById('useRandomAvatar');
+const useRandomImage = document.getElementById('useRandomImage');
+const generateBtn = document.getElementById('generateBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const copyCaptionBtn = document.getElementById('copyCaption');
+const postContainer = document.getElementById('postContainer');
+const templateSelect = document.getElementById('template');
+
+profileFile.addEventListener('change', async (e)=> {
+  const f = e.target.files[0];
+  state.avatarImg = await loadImageFromFile(f).catch(()=>null);
+  renderPreview();
+});
+postFile.addEventListener('change', async (e)=> {
+  const f = e.target.files[0];
+  state.postImg = await loadImageFromFile(f).catch(()=>null);
+  renderPreview();
+});
+useRandomAvatar.addEventListener('click', async ()=>{
+  const url = RANDOM_AVATARS[Math.floor(Math.random()*RANDOM_AVATARS.length)];
+  state.avatarImg = await loadImageFromUrl(url).catch(()=>null);
+  renderPreview();
+});
+useRandomImage.addEventListener('click', async ()=>{
+  const url = RANDOM_IMAGES[Math.floor(Math.random()*RANDOM_IMAGES.length)];
+  state.postImg = await loadImageFromUrl(url).catch(()=>null);
+  renderPreview();
+});
+templateSelect.addEventListener('change',(e)=>{ state.template = e.target.value; renderPreview(); });
+
+/* Generate & draw canvas with watermark */
+generateBtn.addEventListener('click', async ()=>{
+  // inputs
+  const name = document.getElementById('displayName').value || 'Anonymous';
+  const handle = document.getElementById('handle').value || '@anon';
+  const caption = document.getElementById('caption').value || '';
+  const likes = document.getElementById('likes').value || '0';
+  const comments = document.getElementById('comments').value || '0';
+  const template = document.getElementById('template').value;
+
+  // ensure images exist
+  if(!state.postImg){
+    state.postImg = await loadImageFromUrl(RANDOM_IMAGES[Math.floor(Math.random()*RANDOM_IMAGES.length)]);
+  }
+  if(!state.avatarImg){
+    state.avatarImg = await loadImageFromUrl(RANDOM_AVATARS[Math.floor(Math.random()*RANDOM_AVATARS.length)]);
+  }
+
+  // sizes per template
+  let cw=1080, ch=1080; // instagram
+  if(template==='twitter'){ cw=1200; ch=675; }
+  if(template==='facebook'){ cw=1200; ch=630; }
+  if(template==='whatsapp'){ cw=1080; ch=1920; } // vertical story/status
+
+  const canvas = document.createElement('canvas');
+  canvas.width = cw; canvas.height = ch;
+  const ctx = canvas.getContext('2d');
+
+  // white background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,cw,ch);
+
+  // padding and layout calculations (simple)
+  const pad = Math.round(cw * 0.04);
+  const innerW = cw - pad*2;
+
+  // top area (avatar+name)
+  const avSize = Math.round(cw * 0.09);
+  const avX = pad, avY = pad;
+
+  // draw avatar circular
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(avX + avSize/2, avY + avSize/2, avSize/2, 0, Math.PI*2);
+  ctx.closePath();
+  ctx.clip();
+  // draw avatar image covering box
+  if(state.avatarImg){
+    const img = state.avatarImg;
+    const ar = img.width / img.height;
+    let dw = avSize, dh = avSize, dx = avX, dy = avY;
+    if(ar > 1){ dw = avSize * ar; dx = avX - (dw - avSize)/2; }
+    else { dh = avSize / ar; dy = avY - (dh - avSize)/2; }
+    ctx.drawImage(img, dx, dy, dw, dh);
+  } else {
+    ctx.fillStyle = '#ddd'; ctx.fillRect(avX, avY, avSize, avSize);
+  }
+  ctx.restore();
+
+  // name & handle
+  ctx.fillStyle = '#111'; ctx.font = `${Math.round(cw*0.032)}px Roboto`; ctx.textBaseline='top';
+  ctx.fillText(name, avX + avSize + 12, avY + 2);
+  ctx.fillStyle = '#666'; ctx.font = `${Math.round(cw*0.02)}px Roboto`;
+  ctx.fillText(handle, avX + avSize + 12, avY + Math.round(cw*0.032)+8);
+
+  // time (right)
+  ctx.fillStyle = '#666'; ctx.textAlign='right'; ctx.font = `${Math.round(cw*0.02)}px Roboto`;
+  const timeStr = new Date().toLocaleString();
+  ctx.fillText(timeStr.split(',')[0], cw - pad, avY + 2);
+  ctx.textAlign='start';
+
+  // image area
+  const imageTop = avY + avSize + 16;
+  // for whatsapp status, make image occupy more vertical space
+  let imageH;
+  if(template==='whatsapp') imageH = Math.round(ch * 0.65);
+  else imageH = Math.round(ch * 0.55);
+  const imageW = innerW;
+  const imageX = pad, imageY = imageTop;
+
+  // draw post image with cover behavior
+  if(state.postImg){
+    const img = state.postImg;
+    const arImg = img.width / img.height;
+    const arBox = imageW / imageH;
+    let dw, dh, dx, dy;
+    if(arImg > arBox){
+      dh = imageH; dw = dh * arImg; dx = imageX - (dw - imageW) / 2; dy = imageY;
+    } else {
+      dw = imageW; dh = dw / arImg; dx = imageX; dy = imageY - (dh - imageH) / 2;
+    }
+    ctx.drawImage(img, dx, dy, dw, dh);
+  } else {
+    ctx.fillStyle = '#ddd'; ctx.fillRect(imageX, imageY, imageW, imageH);
+  }
+
+  // below image: likes and caption
+  let y = imageY + imageH + 12;
+  ctx.fillStyle = '#111'; ctx.font = `${Math.round(cw*0.03)}px Roboto`; ctx.fillText(`${likes} likes`, imageX, y);
+
+  y += Math.round(cw*0.04);
+  ctx.fillStyle = '#111'; ctx.font = `${Math.round(cw*0.028)}px Roboto`;
+  const maxWidth = innerW;
+  wrapText(ctx, caption, imageX, y, maxWidth, Math.round(cw*0.036));
+
+  // comments at bottom-right
+  ctx.fillStyle = '#666'; ctx.font = `${Math.round(cw*0.02)}px Roboto`; ctx.textAlign='right';
+  ctx.fillText(`${comments} comments`, cw - pad, ch - pad - 6);
+  ctx.textAlign='start';
+
+  // watermark: diagonal faint text bottom-right
+  const wmText = 'Yldl4u';
+  ctx.save();
+  ctx.translate(cw - pad - 10, ch - pad - 10);
+  ctx.rotate(-Math.PI/8);
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = '#000';
+  ctx.font = `${Math.round(cw*0.05)}px Roboto`;
+  ctx.fillText(wmText, 0, 0);
+  ctx.restore();
+
+  // small watermark corner (opaque, subtle)
+  ctx.save();
+  ctx.globalAlpha = 0.75;
+  ctx.fillStyle = '#000';
+  ctx.font = `${Math.round(cw*0.018)}px Roboto`;
+  ctx.fillText('© Yldl4u', pad, ch - pad);
+  ctx.restore();
+
+  // thin border
+  ctx.strokeStyle = '#e6e6e6'; ctx.lineWidth = 1; ctx.strokeRect(1,1,cw-2,ch-2);
+
+  // show scaled preview and enable download
+  showCanvasPreview(canvas);
+
+  downloadBtn.style.display = 'inline-flex';
+  downloadBtn.onclick = ()=> {
+    const a = document.createElement('a');
+    a.download = `post-${Date.now()}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+});
+
+/* wrap text helper */
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  ctx.fillStyle = ctx.fillStyle || '#111';
+  const words = text.split(' ');
+  let line = '';
+  for(let n = 0; n < words.length; n++){
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+    if(testWidth > maxWidth && n > 0){
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+/* preview: quick DOM mock */
+function renderPreview(){
+  postContainer.innerHTML = '';
+  const post = document.createElement('div');
+  post.className = 'post';
+  post.style.width = '520px';
+  post.style.background = '#fff';
+  post.style.borderRadius = '8px';
+  post.style.overflow = 'hidden';
+
+  // top
+  const top = document.createElement('div');
+  top.className = 'top';
+  top.style.display='flex'; top.style.alignItems='center'; top.style.gap='10px'; top.style.padding='12px';
+  const av = document.createElement('img');
+  av.className='avatar'; av.style.width='44px'; av.style.height='44px'; av.style.borderRadius='50%';
+  if(state.avatarImg) av.src = state.avatarImg.src; else av.style.background='#ddd';
+  const user = document.createElement('div');
+  user.className='user';
+  const uname = document.createElement('div'); uname.className='username'; uname.textContent = document.getElementById('displayName').value || 'Anonymous';
+  const uhandle = document.createElement('div'); uhandle.className='handle'; uhandle.style.color='#666'; uhandle.textContent = document.getElementById('handle').value || '@anon';
+  user.appendChild(uname); user.appendChild(uhandle);
+  top.appendChild(av); top.appendChild(user);
+  post.appendChild(top);
+
+  // image
+  const imageDiv = document.createElement('div');
+  imageDiv.className='image'; imageDiv.style.background='#000'; imageDiv.style.height='360px'; imageDiv.style.display='flex'; imageDiv.style.alignItems='center'; imageDiv.style.justifyContent='center';
+  if(state.postImg){
+    const pimg = document.createElement('img');
+    pimg.src = state.postImg.src;
+    pimg.style.maxWidth='100%'; pimg.style.maxHeight='100%';
+    imageDiv.appendChild(pimg);
+  } else {
+    imageDiv.textContent='No image';
+    imageDiv.style.color='#777';
+  }
+  post.appendChild(imageDiv);
+
+  // bottom
+  const bottom = document.createElement('div');
+  bottom.className='bottom'; bottom.style.padding='12px';
+  const like = document.createElement('div'); like.className='likes'; like.textContent = (document.getElementById('likes').value || '0') + ' likes';
+  bottom.appendChild(like);
+  const captionEl = document.createElement('div'); captionEl.className='caption'; captionEl.textContent = document.getElementById('caption').value || '';
+  bottom.appendChild(captionEl);
+  post.appendChild(bottom);
+
+  // small visible watermark badge on preview (so user sees branding)
+  const badge = document.createElement('div');
+  badge.textContent = 'Yldl4u';
+  badge.style.position='absolute'; badge.style.right='18px'; badge.style.bottom='18px'; badge.style.padding='6px 8px'; badge.style.background='rgba(0,0,0,0.6)'; badge.style.color='#fff'; badge.style.borderRadius='6px'; badge.style.fontSize='12px';
+  const wrapper = document.createElement('div'); wrapper.style.position='relative';
+  wrapper.appendChild(post);
+  wrapper.appendChild(badge);
+  postContainer.appendChild(wrapper);
+}
+
+/* show canvas scaled in preview */
+function showCanvasPreview(canvas){
+  const maxPreviewW = 520;
+  const scale = Math.min(1, maxPreviewW / canvas.width);
+  const img = new Image();
+  img.src = canvas.toDataURL();
+  img.style.width = Math.round(canvas.width * scale) + 'px';
+  img.style.borderRadius = '8px';
+  postContainer.innerHTML = '';
+  postContainer.appendChild(img);
+}
+
+/* copy caption */
+copyCaptionBtn.addEventListener('click', ()=> {
+  const cap = document.getElementById('caption').value || '';
+  navigator.clipboard.writeText(cap).then(()=> alert('Caption copied')).catch(()=> alert('Copy failed'));
+});
+
+/* initial small preview */
+renderPreview();
+
+/* Enter to generate */
+document.getElementById('caption').addEventListener('keydown', (e)=>{ if(e.ctrlKey && e.key==='Enter') generateBtn.click(); });
+
+</script>
+</body>
+</html>
