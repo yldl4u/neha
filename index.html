@@ -1,136 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Instagram Hashtag Generator</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Yldl4u • Hashtag Generator</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
-  body {
-    font-family: 'Inter', sans-serif;
-    background: #0f1724;
-    color: #e6eef6;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 40px;
-    margin: 0;
-  }
-  .container {
-    width: 90%;
-    max-width: 700px;
-    background: #111827;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-  }
-  h1 {
-    text-align: center;
-    font-size: 24px;
-    color: #a78bfa;
-    margin-bottom: 25px;
-  }
-  label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 8px;
-  }
-  input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #374151;
-    background: #0f1724;
-    color: #fff;
-    font-size: 15px;
-    margin-bottom: 15px;
-  }
-  button {
-    background: #8b5cf6;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-right: 10px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: 0.3s;
-    margin-top: 8px;
-  }
-  button:hover { background: #7c3aed; }
-  .secondary { background: #374151; }
-  .secondary:hover { background: #4b5563; }
-  .hashtags {
-    margin-top: 20px;
-    background: #1f2937;
-    padding: 15px;
-    border-radius: 12px;
-    min-height: 100px;
-    font-size: 15px;
-    line-height: 1.6;
-    word-break: break-word;
-    white-space: pre-wrap;
-  }
-  footer {
-    text-align: center;
-    color: #9ca3af;
-    font-size: 14px;
-    margin-top: 22px;
-  }
-</style>
-</head>
-<body>
-<div class="container">
-  <h1>Instagram Hashtag Generator</h1>
-  
-  <label for="topicInput">Enter your topic:</label>
-  <input type="text" id="topicInput" placeholder="e.g., travel, food, fashion">
-
-  <button id="generateBtn">Generate Hashtags</button>
-  <button id="copyBtn" class="secondary">Copy Hashtags</button>
-  
-  <div class="hashtags" id="hashtagsArea">Your hashtags will appear here...</div>
-  
-  <footer>Created by YLDL4u</footer>
-</div>
-
-<script>
-const trendingHashtags = [
-  "#viral","#trending","#explorepage","#explore","#instagram","#fyp","#instagood",
-  "#love","#reels","#like","#tiktok","#follow","#foryou","#viralpost","#viralvideos",
-  "#photography","#likeforlikes","#fashion","#followforfollowback","#memes","#instadaily",
-  "#music","#india","#indonesia","#reelsinstagram","#trend","#viralreels","#likes",
-  "#foryoupage","#photooftheday"
-];
-
-const topicInput = document.getElementById('topicInput');
-const hashtagsArea = document.getElementById('hashtagsArea');
-const generateBtn = document.getElementById('generateBtn');
-const copyBtn = document.getElementById('copyBtn');
-
-function generateHashtags(topic){
-  let topicTag = topic ? `#${topic.replace(/\s+/g,'')}` : '';
-  let result = trendingHashtags.map(tag => `${tag} #yldl4u`).join(' ');
-  if(topicTag){
-    result = topicTag + ' ' + result;
-  }
-  return result;
+:root{
+  --bg-1: #08101a;
+  --bg-2: #0f1720;
+  --neon: #00f0ff;
+  --accent: #7fffd4;
+  --glass: rgba(255,255,255,0.04);
+  --muted: #a8b3bf;
 }
 
-generateBtn.addEventListener('click', ()=>{
-  const topic = topicInput.value.trim();
-  hashtagsArea.textContent = generateHashtags(topic);
-});
+/* Page reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(0,240,255,0.035), transparent 8%),
+              radial-gradient(900px 500px at 90% 90%, rgba(127,255,212,0.02), transparent 10%),
+              linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  color:#e6eef6;
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  justify-content:center;
+  padding:40px 18px;
+}
 
-copyBtn.addEventListener('click', ()=>{
-  navigator.clipboard.writeText(hashtagsArea.textContent);
-  alert('Hashtags copied!');
-});
+/* container */
+.container{
+  width:100%;
+  max-width:1100px;
+  display:grid;
+  grid-template-columns: 1fr 420px;
+  gap:28px;
+  align-items:start;
+}
 
-// Optional: Ctrl+Enter shortcut to generate
-document.addEventListener('keydown', e=>{
-  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
-    generateBtn.click();
+/* left card (generator) */
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding:22px;
+  border-radius:14px;
+  box-shadow: 0 10px 40px rgba(2,6,23,0.6);
+  backdrop-filter: blur(6px);
+  position:relative;
+  overflow:hidden;
+}
+
+/* subtle animated grid on card */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px;
+  opacity:0.6;
+  mix-blend-mode:overlay;
+  transform: translateY(0);
+  animation: drift 18s linear infinite;
+}
+@keyframes drift { from{transform:translateY(0)} to{transform:translateY(-80px)} }
+
+/* header + logo */
+.header{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  margin-bottom:14px;
+}
+.logo{
+  font-family: "JetBrains Mono", monospace;
+  font-weight:700;
+  color:var(--neon);
+  font-size:28px;
+  letter-spacing:2px;
+  text-shadow: 0 6px 28px rgba(0,240,255,0.08), 0 0 8px rgba(0,240,255,0.18);
+  transform:translateZ(0);
+  animation: glow 2.1s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from { filter: drop-shadow(0 0 8px rgba(0,240,255,0.06)); transform:translateY(-1px) }
+  to { filter: drop-shadow(0 0 18px rgba(0,240,255,0.18)); transform:translateY(1px) }
+}
+
+.h-title{
+  font-weight:600;
+  font-size:18px;
+  color:#dff8ff;
+}
+.h-sub{ font-size:13px; color:var(--muted); margin-top:3px; }
+
+/* input row */
+.row{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  align-items:center;
+}
+.input{
+  flex:1;
+  display:flex;
+  gap:8px;
+}
+.input input{
+  width:100%;
+  padding:12px 14px;
+  background:var(--glass);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.03);
+  color:var(--muted);
+  outline:none;
+  font-weight:600;
+  letter-spacing:0.2px;
+}
+.btn{
+  background: linear-gradient(180deg, var(--neon), #00b4ff);
+  color:#00121a;
+  border:none;
+  padding:11px 14px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow: 0 8px 30px rgba(0,180,255,0.08);
+}
+.btn:active{ transform:translateY(1px) }
+
+/* controls small */
+.controls{
+  display:flex;
+  gap:12px;
+  margin-top:12px;
+  align-items:center;
+  justify-content:space-between;
+}
+.small{
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* results area */
+.results{
+  margin-top:18px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.hashtag{
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+  border:1px solid rgba(0,240,255,0.06);
+  color:var(--neon);
+  font-weight:600;
+  cursor:pointer;
+  transition: transform .12s ease, background .12s;
+}
+.hashtag:active{ transform: translateY(2px); }
+.hashtag:hover{ background: linear-gradient(90deg, rgba(0,240,255,0.06), rgba(127,255,212,0.03)); color:#04121a; }
+
+/* right column (about + CTA) */
+.side {
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  align-items:stretch;
+}
+.panel{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:12px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,0.03);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+}
+.about-title{
+  font-size:20px;
+  font-weight:800;
+  color:var(--accent);
+  letter-spacing:0.6px;
+  margin-bottom:8px;
+  text-shadow: 0 6px 18px rgba(127,255,212,0.04);
+  animation: pop 1.4s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes pop { from{transform:translateY(6px) scale(.98); opacity:0} to{transform:none;opacity:1} }
+
+.about-desc{
+  font-size:15px;
+  color:#dbeef2;
+  line-height:1.45;
+  margin-bottom:12px;
+}
+.mission{
+  background: linear-gradient(90deg, rgba(0,240,255,0.03), rgba(127,255,212,0.02));
+  border-radius:10px;
+  padding:12px;
+  color:#00121a;
+  font-weight:700;
+  display:block;
+  margin-top:8px;
+  box-shadow: inset 0 -6px 20px rgba(0,0,0,0.12);
+}
+
+/* instagram CTA */
+.ig {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:8px;
+}
+.ig a{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  padding:10px 12px;
+  border-radius:10px;
+  background:linear-gradient(90deg,#ff6a88,#5f2c82);
+  color:#fff;
+  font-weight:700;
+  box-shadow:0 10px 30px rgba(95,44,130,0.18);
+}
+
+/* footer small */
+.foot-note{ font-size:12px; color:var(--muted); margin-top:10px; }
+
+/* responsive */
+@media (max-width:980px){
+  .container{ grid-template-columns: 1fr; }
+  .side{ order:2 }
+}
+
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- LEFT: generator -->
+    <div class="card" aria-label="Hashtag generator">
+      <div class="header">
+        <div class="logo">Yldl4u</div>
+        <div>
+          <div class="h-title">Hashtag Generator</div>
+          <div class="h-sub">Type anything. Get viral-ready hashtags — instant copy.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input">
+          <input id="topic" type="text" placeholder="Enter topic — e.g. love, travel, fashion" aria-label="topic">
+        </div>
+        <button class="btn" onclick="generateHashtags()">Generate</button>
+      </div>
+
+      <div class="controls">
+        <div class="small">50 unique tags • subtle <strong>#yldl4u</strong> in the middle</div>
+        <div>
+          <button class="btn" style="padding:8px 12px" onclick="copyAllHashtags()">Copy All</button>
+        </div>
+      </div>
+
+      <div id="results" class="results" role="list" aria-live="polite" style="margin-top:18px"></div>
+      <div class="foot-note">Click any tag to copy it individually.</div>
+    </div>
+
+    <!-- RIGHT: about / mission -->
+    <aside class="side">
+      <div class="panel">
+        <div class="about-title">About</div>
+        <div class="about-desc" id="aboutText">
+          Yldl4u Hashtag Generator is designed to make posting on Instagram effortless.
+          Enter a topic and instantly receive a curated set of viral-ready hashtags that
+          combine topic-specific variations, trending patterns and subtle branding.
+        </div>
+
+        <div class="about-title" style="font-size:16px; margin-top:6px">Our Mission</div>
+        <div class="about-desc" style="font-size:15px; font-weight:600">
+          <span style="display:block; font-size:14px; color:var(--muted); margin-bottom:8px">Mission</span>
+          Make it frictionless for <strong>Neha (Ladly)</strong> and creators like her to post photos
+          on Instagram without wasting time hunting hashtags. Generate, copy and post — done.
+        </div>
+
+        <div class="mission">Mission: Ensure Ladly never struggles with hashtags when posting photos.</div>
+
+        <div class="ig" style="margin-top:14px">
+          <a href="https://www.instagram.com/Yldl4u" target="_blank" rel="noopener noreferrer">
+            Follow @Yldl4u
+          </a>
+        </div>
+      </div>
+
+      <div class="panel" style="text-align:center; color:var(--muted); font-size:13px">
+        Pro tip: Tap a hashtag to copy. Use "Copy All" to paste directly into your Instagram caption.
+      </div>
+    </aside>
+  </div>
+
+<script>
+/* ------------------------------
+   Hashtag generation logic
+   - performance tuned: build array then one DOM append (fragment)
+   - 50 unique tags, #yldl4u in center
+   ------------------------------ */
+function generateHashtags(){
+  const topicInput = document.getElementById('topic');
+  const topicRaw = topicInput.value.trim();
+  if(!topicRaw){
+    topicInput.focus();
+    alert('Please enter a topic.');
+    return;
   }
+  const topic = topicRaw.toLowerCase().replace(/[^a-z0-9]+/g,''); // clean
+  const suffixPools = [
+    "life","daily","moments","insta","viral","world","love","fun","style","day","vibes","real",
+    "time","trending","photo","pic","like","follow","cute","happy","amazing","today","best",
+    "explore","fashion","travel","food","adventure","blog","fitness","music","selfie","beautiful",
+    "smile","instagood","trend","instadaily","instamood","photography","picoftheday","funny",
+    "viralpost","lifestyle","loveit","hot","top","musthave","exploremore","wow","now","season"
+  ];
+
+  // Build a set of unique generated tags
+  const hset = new Set();
+
+  // Provide a variety of patterns to make tags look 'viral' and organic
+  const patterns = [
+    t=> t,
+    t=> t + "life",
+    t=> t + "daily",
+    t=> t + "moments",
+    t=> t + "insta",
+    t=> t + "vibes",
+    t=> t + "world",
+    t=> "the"+t,
+    t=> "lovely"+t,
+    t=> t + "love",
+    t=> t + "style",
+    t=> t + "gram",
+    t=> t + "hub",
+    t=> "go"+t,
+    t=> t + "now",
+    t=> t + Math.floor(Math.random()*99+1),
+    t=> t + "_" + suffixPools[Math.floor(Math.random()*suffixPools.length)],
+    t=> suffixPools[Math.floor(Math.random()*suffixPools.length)] + t,
+    t=> t + "trend",
+    t=> t + "posts"
+  ];
+
+  // Seed the set with strong topic + popular combos
+  // Ensure uniqueness: limit iterations to safe number
+  let attempts = 0;
+  while(hset.size < 49 && attempts < 1000){
+    attempts++;
+    // pick a random pattern
+    const fn = patterns[Math.floor(Math.random()*patterns.length)];
+    let candidate = fn(topic);
+    // clean duplicates like repeated parts
+    candidate = candidate.replace(/_{2,}/g,'_').replace(/[^a-z0-9_]/g,'');
+    if(candidate.length > 28) candidate = candidate.substring(0,28);
+    // avoid adding if it's purely numeric or empty
+    if(!/^[0-9]+$/.test(candidate) && candidate.length>0){
+      hset.add(candidate);
+    }
+  }
+
+  // Convert to array and insert middle brand tag
+  const list = Array.from(hset).slice(0,49); // safety
+  const middleIndex = Math.floor(list.length/2);
+  list.splice(middleIndex, 0, "yldl4u"); // ensure center subtle tag
+
+  // Build DOM fragment
+  const frag = document.createDocumentFragment();
+  const results = document.getElementById('results');
+  results.innerHTML = ''; // clear
+  for(let tag of list){
+    const span = document.createElement('button');
+    span.type = 'button';
+    span.className = 'hashtag';
+    span.setAttribute('aria-label', 'copy hashtag '+tag);
+    span.innerText = '#'+tag;
+    span.addEventListener('click', ()=> {
+      copyTag('#'+tag, span);
+    });
+    frag.appendChild(span);
+  }
+  results.appendChild(frag);
+
+  // small UX flourish: focus out
+  topicInput.blur();
+}
+
+/* copy individual tag and tiny visual feedback */
+function copyTag(text, node){
+  navigator.clipboard.writeText(text).then(()=>{
+    // tiny pulse effect
+    const original = node.style.transform;
+    node.style.transform = 'scale(0.98)';
+    setTimeout(()=> node.style.transform = original, 160);
+    // subtle toast alternative: accessible alert
+    announce(text + ' copied');
+  }).catch(()=> announce('Copy failed — select manually'));
+}
+
+/* copy all */
+function copyAllHashtags(){
+  const nodes = document.querySelectorAll('.hashtag');
+  if(!nodes.length){ alert('No hashtags to copy — generate first.'); return; }
+  const all = Array.from(nodes).map(n=>n.innerText).join(' ');
+  navigator.clipboard.writeText(all).then(()=> announce('All hashtags copied')).catch(()=> announce('Copy failed'));
+}
+
+/* accessible announcer (sr-only style via alert fallback) */
+function announce(message){
+  // quick visible fallback
+  const el = document.createElement('div');
+  el.style.position='fixed';
+  el.style.right='18px';
+  el.style.bottom='18px';
+  el.style.padding='10px 14px';
+  el.style.background='linear-gradient(90deg,#00121a,#00333a)';
+  el.style.borderRadius='10px';
+  el.style.color='#c6f6f5';
+  el.style.fontWeight=700;
+  el.style.boxShadow='0 8px 30px rgba(0,0,0,0.6)';
+  el.innerText = message;
+  document.body.appendChild(el);
+  setTimeout(()=> {
+    el.style.transition='opacity .4s ease, transform .4s ease';
+    el.style.opacity='0'; el.style.transform='translateY(10px)';
+    setTimeout(()=> el.remove(),400);
+  },900);
+}
+
+/* optional: generate on enter */
+document.getElementById('topic').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') generateHashtags();
 });
 </script>
 </body>
