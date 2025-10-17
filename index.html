@@ -5,285 +5,128 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Yldl4u • Hashtag Generator</title>
 
-<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg-1:#061017;
-  --bg-2:#0b1820;
-  --neon:#00f0ff;
-  --accent:#7fffd4;
-  --glass:rgba(255,255,255,0.03);
-  --muted:#9fb0bd;
-  --card-bg: rgba(255,255,255,0.02);
+  --bg1:#061017; --bg2:#0b1820; --neon:#00f0ff; --accent:#7fffd4;
+  --glass:rgba(255,255,255,0.03); --muted:#9fb0bd; --card-bg: rgba(255,255,255,0.02);
 }
 
 /* reset */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family:"Inter",system-ui,sans-serif;
   background:
     radial-gradient(800px 500px at 10% 10%, rgba(0,240,255,0.03), transparent 8%),
     radial-gradient(700px 400px at 95% 90%, rgba(127,255,212,0.02), transparent 8%),
-    linear-gradient(180deg,var(--bg-1),var(--bg-2));
+    linear-gradient(180deg,var(--bg1),var(--bg2));
   color:#e7f3f6;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  display:flex;
-  justify-content:center;
-  padding:24px;
+  display:flex; justify-content:center; padding:24px;
 }
 
-/* fixed header */
+/* header */
 .header-wrap{
-  position:fixed;
-  top:14px;
-  left:50%;
-  transform:translateX(-50%);
-  width:calc(100% - 48px);
-  max-width:1100px;
-  z-index:999;
-  pointer-events:none; /* allow clicks through except on controls */
+  position:fixed; top:14px; left:50%; transform:translateX(-50%);
+  width:calc(100% - 48px); max-width:1100px; z-index:999;
 }
 .header{
-  pointer-events:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 18px;
-  border-radius:12px;
+  display:flex; justify-content:center; align-items:center; flex-direction:column;
+  gap:6px; padding:14px 18px; border-radius:12px;
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-  box-shadow: 0 12px 40px rgba(1,10,18,0.6);
-  backdrop-filter: blur(8px);
+  border:1px solid rgba(255,255,255,0.03); backdrop-filter:blur(8px);
 }
-.header-left{display:flex;gap:14px;align-items:center}
 .logo{
-  font-family: "JetBrains Mono", monospace;
-  font-weight:800;
-  color:var(--neon);
-  letter-spacing:2px;
-  font-size:28px;
-  text-shadow: 0 8px 30px rgba(0,240,255,0.06);
-  animation:logoFloat 2.4s ease-in-out infinite alternate;
+  font-family:"JetBrains Mono",monospace; font-weight:800; font-size:36px;
+  color:#00f0ff; letter-spacing:2px;
+  text-shadow: 0 6px 20px rgba(0,240,255,0.2);
+  background: linear-gradient(90deg, #00f0ff, #ff00e0, #7fffd4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation:logoFloat 2.5s ease-in-out infinite alternate, hueRotate 4s linear infinite;
 }
-@keyframes logoFloat { from{transform:translateY(-2px)} to{transform:translateY(2px)} }
-.header-title{font-weight:700;color:#dff8ff;font-size:15px}
-.header-sub{font-size:12px;color:var(--muted);}
+@keyframes logoFloat{from{transform:translateY(-2px)}to{transform:translateY(2px)}}
+@keyframes hueRotate{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+.header-sub{font-size:14px;color:#dff8ff; font-weight:600;}
 
 /* layout */
-.wrapper{
-  width:100%;
-  max-width:1100px;
-  margin-top:92px; /* space under fixed header */
-  display:grid;
-  grid-template-columns: 1fr 380px;
-  gap:28px;
-  align-items:start;
-}
+.wrapper{ width:100%; max-width:1100px; margin-top:120px; display:grid; grid-template-columns:1fr 380px; gap:28px; }
 
-/* main card */
+/* card */
 .card{
   background: linear-gradient(180deg, var(--card-bg), rgba(255,255,255,0.007));
-  border-radius:14px;
-  padding:22px;
+  border-radius:14px; padding:22px;
   border:1px solid rgba(255,255,255,0.03);
-  box-shadow: 0 18px 60px rgba(2,6,23,0.6);
-  backdrop-filter: blur(6px);
-  position:relative;
-  overflow:hidden;
+  box-shadow:0 18px 60px rgba(2,6,23,0.6); backdrop-filter: blur(6px);
 }
-
-/* input area moved lower for airy header feel */
-.input-row{ display:flex; gap:12px; margin-top:8px; align-items:center; }
-.input-wrap{ flex:1; display:flex; }
-.input{
-  width:100%;
-  padding:14px 16px;
-  border-radius:12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-  color:#cfeff2;
-  font-weight:600;
-  font-size:14px;
-  outline:none;
-}
-.input::placeholder{ color:var(--muted); font-weight:500; }
-
-/* primary button */
-.btn{
-  padding:12px 14px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  font-weight:800;
-  color:#00141a;
-  background: linear-gradient(180deg,var(--neon), #00b4ff);
-  box-shadow: 0 10px 36px rgba(0,180,255,0.07);
-  transition: transform .12s ease;
-}
-.btn:active{ transform:translateY(1px); }
-
-/* small controls */
-.controls{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; gap:12px; }
-.small{ font-size:13px; color:var(--muted); }
-
-/* results */
-.results{ margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-.hashtag{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px 12px;
-  border-radius:12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
-  border: 1px solid rgba(0,240,255,0.06);
-  color:var(--neon);
-  font-weight:700;
-  font-size:13px;
-  cursor:pointer;
-  transition: transform .12s ease, background .12s ease;
-}
-.hashtag:active{ transform:translateY(1px); }
-.hashtag:hover{ transform:scale(1.03); background:linear-gradient(90deg, rgba(0,240,255,0.06), rgba(127,255,212,0.03)); color:#02121a; }
-
-/* copy all */
+.input-row{ display:flex; gap:12px; margin-top:8px; }
+.input{flex:1; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); background:var(--glass); color:#cfeff2; font-weight:600; font-size:14px; outline:none;}
+.input::placeholder{color:var(--muted);}
+.btn{padding:12px 14px; border-radius:12px; border:none; cursor:pointer; font-weight:800; color:#00141a; background: linear-gradient(180deg,var(--neon),#00b4ff); box-shadow:0 10px 36px rgba(0,180,255,0.07); transition:.12s;}
+.btn:active{transform:translateY(1px);}
+.results{margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+.hashtag{padding:8px 12px;border-radius:12px;background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border:1px solid rgba(0,240,255,0.06);color:var(--neon); font-weight:700; font-size:13px; cursor:pointer;transition:.12s;}
+.hashtag:hover{background:linear-gradient(90deg, rgba(0,240,255,0.06), rgba(127,255,212,0.03)); color:#02121a; transform:scale(1.03);}
 .copy-all{ margin-top:16px; padding:10px 12px; border-radius:10px; border:none; background:linear-gradient(90deg,#ffd36a,#ff7ab6); color:#001; font-weight:800; cursor:pointer; }
 
 /* side panel */
 .side{ display:flex; flex-direction:column; gap:16px; }
-.panel{
-  padding:18px;
-  border-radius:12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-  box-shadow: 0 12px 36px rgba(2,6,23,0.5);
-}
+.panel{ padding:18px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); box-shadow:0 12px 36px rgba(2,6,23,0.5);}
 .about-title{ font-size:20px; font-weight:800; color:var(--accent); margin-bottom:8px; }
 .about-desc{ font-size:14px; color:#dff8ff; line-height:1.5; }
 .mission{ margin-top:8px; padding:12px; border-radius:10px; background: linear-gradient(90deg, rgba(0,240,255,0.03), rgba(127,255,212,0.02)); color:#032; font-weight:700; }
 
 /* instagram CTA */
-.ig{ margin-top:12px; display:flex; }
-.ig a{
-  text-decoration:none;
-  color:#fff;
-  padding:10px 12px;
-  border-radius:10px;
-  background: linear-gradient(90deg,#ff6a88,#5f2c82);
-  font-weight:800;
-  box-shadow: 0 12px 36px rgba(95,44,130,0.12);
-}
+.ig a{ text-decoration:none; color:#fff; padding:10px 12px; border-radius:10px; background: linear-gradient(90deg,#ff6a88,#5f2c82); font-weight:800; box-shadow:0 12px 36px rgba(95,44,130,0.12); display:inline-block; text-align:center; }
 
 /* toast */
-.toast{
-  position:fixed;
-  right:18px;
-  bottom:18px;
-  background:rgba(3,28,32,0.94);
-  color:#c6fff4;
-  padding:10px 14px;
-  border-radius:10px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-  font-weight:700;
-  z-index:9999;
-  transform: translateY(10px);
-  opacity:0;
-}
+.toast{ position:fixed; right:18px; bottom:18px; background:rgba(3,28,32,0.94); color:#c6fff4; padding:10px 14px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.6); font-weight:700; z-index:9999; transform: translateY(10px); opacity:0; display:flex; justify-content:space-between; align-items:center; min-width:180px;}
+.toast-close{ cursor:pointer; font-weight:800; margin-left:10px; color:#ffd; }
 
 /* responsive */
-@media (max-width:980px){
-  .wrapper{ grid-template-columns: 1fr; margin-top:120px; }
-  .header{ flex-direction:column; gap:6px; }
-  .side{ order:2; }
-  .header-wrap{ left:12px; transform:none; width:calc(100% - 24px); }
-}
+@media(max-width:980px){.wrapper{grid-template-columns:1fr;}.side{order:2;}}
 </style>
 </head>
 <body>
 
-<!-- header -->
 <div class="header-wrap">
   <div class="header">
-    <div class="header-left">
-      <div class="logo">Yldl4u</div>
-      <div>
-        <div class="header-title">Instagram Hashtag Generator</div>
-        <div class="header-sub">Fast, tasteful & subtle branding — #yldl4u in the middle</div>
-      </div>
-    </div>
-    <div class="header-actions" style="pointer-events:auto;">
-      <!-- optional quick generate from header for UX -->
-      <input id="headerInput" type="text" placeholder="Type topic & press Enter" style="padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03); background:var(--glass); color:#cfeff2; font-weight:600; width:220px; margin-right:8px">
-      <button class="btn" onclick="generateFromHeader()">Go</button>
-    </div>
+    <div class="logo">Yldl4u</div>
+    <div class="header-sub">Instagram Hashtag Generator</div>
   </div>
 </div>
 
-<!-- main wrapper -->
 <div class="wrapper">
-  <!-- left -->
-  <div class="card" role="main" aria-labelledby="main-title">
-    <h2 id="main-title" style="font-size:18px; font-weight:800; color:#dff8ff;">Generate hashtags</h2>
-
-    <div class="input-row" aria-hidden="false">
-      <div class="input-wrap">
-        <input id="topic" class="input" type="text" placeholder="Enter topic e.g. love, travel, fashion" aria-label="topic input">
-      </div>
+  <div class="card">
+    <div class="input-row">
+      <input id="topic" class="input" type="text" placeholder="Enter topic e.g. love, travel, fashion">
       <button class="btn" onclick="generateHashtags()">Generate</button>
     </div>
-
-    <div class="controls">
-      <div class="small">50 unique tags • subtle <strong>#yldl4u</strong> centered</div>
-      <div style="display:flex; gap:8px;">
-        <button class="btn" onclick="shuffleCurrent()">Shuffle</button>
-        <button class="copy-all" onclick="copyAllHashtags()">Copy All</button>
-      </div>
-    </div>
-
-    <div id="results" class="results" role="list" aria-live="polite"></div>
+    <div id="results" class="results"></div>
+    <button class="copy-all" onclick="copyAllHashtags()">Copy All</button>
   </div>
 
-  <!-- right side -->
   <div class="side">
     <div class="panel">
       <div class="about-title">About</div>
       <div class="about-desc">
-        Yldl4u Hashtag Generator simplifies posting on Instagram. Enter any topic and get a curated set of viral-ready hashtags that blend topic variations, trending patterns and subtle branding.
+        Yldl4u Hashtag Generator simplifies Instagram posting. Enter any topic and instantly get viral-ready hashtags with subtle branding.
       </div>
-
       <div class="about-title" style="font-size:16px;">Mission</div>
       <div class="about-desc" style="font-weight:600;">
         Make it frictionless for Neha (Ladly) and creators like her to post photos on Instagram without wasting time hunting hashtags. Generate, copy and post — done.<br>
-        <strong>Mission:</strong> Ensure Ladly never struggles with hashtags when posting photos.
+        Mission: Ensure Ladly never struggles with hashtags when posting photos.
       </div>
-
-      <div class="mission">Mission: Ensure Ladly never struggles with hashtags when posting photos.</div>
-
       <div class="ig">
         <a href="https://www.instagram.com/Yldl4u" target="_blank" rel="noopener noreferrer">Follow @Yldl4u</a>
       </div>
     </div>
-
-    <div class="panel" style="text-align:center; color:var(--muted); font-size:13px;">
-      Tip: Click any tag to copy it. Use "Copy All" to paste into your caption.
-    </div>
   </div>
 </div>
 
-<!-- toast container -->
-<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="toast" class="toast"></div>
 
 <script>
-/* ------------------------------
-  Hashtag generation (50 unique)
-  optimized: build array then single DOM append
-  ensures #yldl4u is centered and tags are unique
----------------------------------*/
-
 const lastGenerated = { list: [] };
 
 function cleanTopic(raw){
@@ -300,23 +143,13 @@ function generateHashtags(){
   input.blur();
 }
 
-function generateFromHeader(){
-  const headerInput = document.getElementById('headerInput');
-  const topic = cleanTopic(headerInput.value || '');
-  if(!topic){ headerInput.focus(); showToast('Please enter a topic'); return; }
-  document.getElementById('topic').value = topic;
-  buildAndRender(topic);
-  headerInput.blur();
-}
-
-/* Generate unique candidates */
 function buildAndRender(topic){
   const suffixPools = [
     "life","daily","moments","insta","viral","world","love","fun","style","day","vibes","real","time",
     "trending","photo","pic","like","follow","cute","happy","amazing","today","best","explore","fashion",
     "travel","food","adventure","blog","fitness","music","selfie","beautiful","smile","instagood","trend",
     "instadaily","instamood","photography","picoftheday","funny","viralpost","lifestyle","loveit","hot",
-    "top","musthave","exploremore","wow","now","season","hits","moments","diaries","stories"
+    "top","musthave","exploremore","wow","now","season","hits","diaries","stories","shots","clicks","feed","mode"
   ];
 
   const patterns = [
@@ -347,17 +180,13 @@ function buildAndRender(topic){
     t => t + "mode"
   ];
 
-  // Use set for uniqueness
   const set = new Set();
-
-  // Seed with a few deterministic strong patterns first for relevance
   set.add(topic);
   set.add(topic + "life");
   set.add(topic + "daily");
   set.add(topic + "insta");
   set.add("the" + topic);
 
-  // Add varied patterns until we have 49 items (we'll insert yldl4u as the 50th center)
   let attempts = 0;
   while(set.size < 49 && attempts < 2000){
     attempts++;
@@ -368,19 +197,13 @@ function buildAndRender(topic){
     }
   }
 
-  // Convert to array and ensure exactly 49 (or as many as generated)
   let list = Array.from(set).slice(0,49);
-
-  // Insert brand tag exactly in middle
   const middleIndex = Math.floor(list.length / 2);
-  list.splice(middleIndex, 0, "yldl4u"); // now length = 50
-
-  lastGenerated.list = list.slice(); // save for shuffle or copy
-
+  list.splice(middleIndex, 0, "yldl4u"); // 50th tag centered
+  lastGenerated.list = list.slice();
   renderList(list);
 }
 
-/* Render to DOM using fragment (single append for performance) */
 function renderList(list){
   const results = document.getElementById('results');
   results.innerHTML = '';
@@ -402,83 +225,41 @@ function renderList(list){
   showToast('Generated ' + list.length + ' tags');
 }
 
-/* Copy single tag with subtle visual feedback */
 function copySingle(text, node){
   navigator.clipboard.writeText(text).then(() => {
     node.style.transform = 'scale(0.98)';
     setTimeout(() => node.style.transform = '', 150);
     showToast(text + ' copied');
-  }).catch(() => {
-    showToast('Copy failed — select manually');
-  });
+  }).catch(() => showToast('Copy failed — select manually'));
 }
 
-/* Copy all */
 function copyAllHashtags(){
   const list = lastGenerated.list;
   if(!list || !list.length){ showToast('No tags — generate first'); return; }
   const all = list.map(t => '#' + t).join(' ');
-  navigator.clipboard.writeText(all).then(() => {
-    showToast('All hashtags copied');
-  }).catch(() => {
-    showToast('Copy failed — select manually');
-  });
+  navigator.clipboard.writeText(all).then(() => showToast('All hashtags copied'))
+  .catch(() => showToast('Copy failed — select manually'));
 }
 
-/* Shuffle current list (useful if some tags feel off) */
-function shuffleCurrent(){
-  const list = lastGenerated.list;
-  if(!list || !list.length){ showToast('No tags to shuffle — generate first'); return; }
-  // simple Fisher-Yates
-  const arr = list.slice();
-  for(let i = arr.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  // ensure yldl4u is centered: find and move to middle
-  const idx = arr.indexOf('yldl4u');
-  if(idx !== -1){
-    arr.splice(idx,1);
-    arr.splice(Math.floor(arr.length/2),0,'yldl4u');
-  }
-  lastGenerated.list = arr;
-  renderList(arr);
-}
-
-/* small toast helper */
 let toastTimer = null;
 function showToast(msg){
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg + ' <span class="toast-close" onclick="closeToast()">✕</span>';
   t.style.transition = 'none';
   t.style.opacity = '1';
   t.style.transform = 'translateY(0)';
   if(toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    t.style.transition = 'opacity .45s ease, transform .45s ease';
-    t.style.opacity = '0';
-    t.style.transform = 'translateY(10px)';
-  }, 1200);
+  toastTimer = setTimeout(() => { closeToast(); }, 3500);
 }
 
-/* Enter key wiring for both inputs */
-document.getElementById('topic').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') generateHashtags();
-});
-document.getElementById('headerInput').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') generateFromHeader();
-});
+function closeToast(){
+  const t = document.getElementById('toast');
+  t.style.transition = 'opacity .45s ease, transform .45s ease';
+  t.style.opacity = '0';
+  t.style.transform = 'translateY(10px)';
+}
 
-/* small accessibility: focus styles */
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Tab'){
-    document.body.classList.add('show-focus');
-  }
-});
+document.getElementById('topic').addEventListener('keydown', (e) => { if(e.key === 'Enter') generateHashtags(); });
 </script>
-
-<!-- toast element -->
-<div id="toast" class="toast" aria-hidden="true"></div>
-
 </body>
 </html>
