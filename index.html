@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Hashtag Generator</title>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0f1724;
+    color: #e6eef6;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+    margin: 0;
+  }
+  .container {
+    width: 90%;
+    max-width: 700px;
+    background: #111827;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+  }
+  h1 {
+    text-align: center;
+    font-size: 24px;
+    color: #a78bfa;
+    margin-bottom: 25px;
+  }
+  label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #374151;
+    background: #0f1724;
+    color: #fff;
+    font-size: 15px;
+    margin-bottom: 15px;
+  }
+  button {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s;
+    margin-top: 8px;
+  }
+  button:hover { background: #7c3aed; }
+  .secondary { background: #374151; }
+  .secondary:hover { background: #4b5563; }
+  .hashtags {
+    margin-top: 20px;
+    background: #1f2937;
+    padding: 15px;
+    border-radius: 12px;
+    min-height: 100px;
+    font-size: 15px;
+    line-height: 1.6;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+  footer {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 14px;
+    margin-top: 22px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Instagram Hashtag Generator</h1>
+  
+  <label for="topicInput">Enter your topic:</label>
+  <input type="text" id="topicInput" placeholder="e.g., travel, food, fashion">
+
+  <button id="generateBtn">Generate Hashtags</button>
+  <button id="copyBtn" class="secondary">Copy Hashtags</button>
+  
+  <div class="hashtags" id="hashtagsArea">Your hashtags will appear here...</div>
+  
+  <footer>Created by YLDL4u</footer>
+</div>
+
+<script>
+const trendingHashtags = [
+  "#viral","#trending","#explorepage","#explore","#instagram","#fyp","#instagood",
+  "#love","#reels","#like","#tiktok","#follow","#foryou","#viralpost","#viralvideos",
+  "#photography","#likeforlikes","#fashion","#followforfollowback","#memes","#instadaily",
+  "#music","#india","#indonesia","#reelsinstagram","#trend","#viralreels","#likes",
+  "#foryoupage","#photooftheday"
+];
+
+const topicInput = document.getElementById('topicInput');
+const hashtagsArea = document.getElementById('hashtagsArea');
+const generateBtn = document.getElementById('generateBtn');
+const copyBtn = document.getElementById('copyBtn');
+
+function generateHashtags(topic){
+  let topicTag = topic ? `#${topic.replace(/\s+/g,'')}` : '';
+  let result = trendingHashtags.map(tag => `${tag} #yldl4u`).join(' ');
+  if(topicTag){
+    result = topicTag + ' ' + result;
+  }
+  return result;
+}
+
+generateBtn.addEventListener('click', ()=>{
+  const topic = topicInput.value.trim();
+  hashtagsArea.textContent = generateHashtags(topic);
+});
+
+copyBtn.addEventListener('click', ()=>{
+  navigator.clipboard.writeText(hashtagsArea.textContent);
+  alert('Hashtags copied!');
+});
+
+// Optional: Ctrl+Enter shortcut to generate
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    generateBtn.click();
+  }
+});
+</script>
+</body>
+</html>
